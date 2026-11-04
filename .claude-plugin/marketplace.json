@@ -1,0 +1,26 @@
+{
+  "name": "imzlab-local-leads",
+  "owner": {
+    "name": "Imzlab Technologies",
+    "email": "info@imzlab.com"
+  },
+  "description": "Imzlab Technologies plugins for Claude: local business lead lists.",
+  "plugins": [
+    {
+      "name": "local-business-leads",
+      "source": "./",
+      "description": "Local Business Leads: Google Maps, Yellow Pages US and Canada, and BBB inside Claude. Any niche and city, business emails, dedupe, email validation, CSV export. Pay per record on Apify.",
+      "category": "productivity",
+      "tags": [
+        "lead generation",
+        "local business",
+        "google maps",
+        "yellow pages",
+        "bbb",
+        "b2b leads",
+        "sales",
+        "prospecting"
+      ]
+    }
+  ]
+}
