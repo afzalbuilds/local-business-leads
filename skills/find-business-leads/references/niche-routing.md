@@ -1,6 +1,6 @@
 # Niche and country routing
 
-Pick the Actor from the user's niche and country with the first matching row. "Actor" names the connector tool to call.
+Pick the Actor from the user's niche and country with the first matching row. "Actor" names the tool to call on the business-leads MCP server.
 
 | # | User asks for | Country | Actor | Why |
 |---|---|---|---|---|

@@ -17,12 +17,13 @@ Builds on the `find-business-leads` skill: read its `references/actor-contracts.
 
 4. **Flag quality issues** without running anything: missing phone and website, Yellow Pages `isAd` rows, rows whose website host does not match the email domain (a possible stale email), and businesses with a rating under 3 if the user cares about reputation.
 
-5. **Export.** Write the CSV with the column order in `lead-schema.md`. In Claude Code or Cowork, write it next to the input file or in the working folder as `<name>-clean-<YYYY-MM-DD>.csv`; in chat, give a downloadable file, or a code block if that is not possible. For HubSpot or Salesforce, rename the columns as described in `lead-schema.md` and say which columns the CRM will still ask to map.
+5. **Export.** Write the CSV with the column order in `lead-schema.md`. When you can write files (a coding agent or a desktop workspace), write it next to the input file or in the working folder as `<name>-clean-<YYYY-MM-DD>.csv`; in a chat-only app, give it as a downloadable file, or as a code block if that is not possible. For HubSpot or Salesforce, rename the columns as described in `lead-schema.md` and say which columns the CRM will still ask to map.
 
 6. **Report** in this order: a summary line (rows in, duplicates merged, rows out, emails valid/risky/invalid, Apify cost), a short "needs attention" table (invalid emails, missing contact details), then the file.
 
 ## Rules
 
 - Never fabricate a validation result. Addresses that were not checked stay "not checked".
+- The Apify cost in the summary comes from the price table in `actor-contracts.md`, never from usage or cost fields in a run response.
 - Validation never sends an email and never contacts the person; say so if the user asks.
 - Keep personal data minimal: do not add columns the sources did not have, and do not look up individuals.

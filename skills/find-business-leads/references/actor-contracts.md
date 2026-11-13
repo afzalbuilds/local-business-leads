@@ -2,7 +2,7 @@
 
 Prices are Apify Store pay-per-event prices on the FREE tier as of 2026-11-04; paid Apify plans are 2.5 to 20 percent lower. A record is charged when it is written to the dataset (exceptions are noted per Actor). Every run also charges one start event per started GB of the Actor's default memory. Schemas were read from the Actors' live default builds on 2026-11-04 and the output shapes were checked against live runs on the same day (see the note at the end).
 
-All Actors belong to Apify user `muhammadafzal`. On the **business-leads** connector the tool name is the Actor ID with `/` replaced by `--`, for example `muhammadafzal--google-maps-scraper`. Each tool returns the run (`runId`, `status`, `storages.datasets.default.id`, `storages.keyValueStores.default.id`), not the rows. If a tool response already includes dataset items, use them; otherwise fetch them with `get-dataset-items`.
+All Actors belong to Apify user `muhammadafzal`. On the **business-leads** MCP server the tool name is the Actor ID with `/` replaced by `--`, for example `muhammadafzal--google-maps-scraper`. Some apps add a server prefix, turn hyphens into underscores, or shorten a long name and add a suffix; match on the start of the Actor slug. Each tool returns the run (`runId`, `status`, `storages.datasets.default.id`, `storages.keyValueStores.default.id`), not the rows. If a tool response already includes dataset items, use them; otherwise fetch them with `get-dataset-items`.
 
 Run options (`memory`, `timeout`, `maxTotalChargeUsd`) go in the tool's `callOptions`, never inside `input`. Send only the input fields listed below. Every Actor handles its own network routing internally, so nothing else is needed.
 
@@ -11,6 +11,7 @@ Run options (`memory`, `timeout`, `maxTotalChargeUsd`) go in the tool's `callOpt
 - `maxResults` is the spending control. Always set it to the number the user asked for, never leave the default.
 - Google Maps lists about 120 places for one search. Asking for more from one search rarely adds rows; split the area into several cities, ZIP codes or neighbourhoods instead.
 - A search that finds nothing charges only the start event. Blocked requests never charge a record.
+- Always compute a cost from the prices in this file. A run response can include usage or cost fields (for example `usageTotalUsd`); those are Apify's internal platform usage and are far lower than the billed price, so never report them as the cost.
 - The key-value record named per Actor explains the run: how many rows were delivered, why it stopped, and warnings. Read it whenever fewer rows than requested came back.
 
 ---

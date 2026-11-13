@@ -5,7 +5,7 @@ description: Find local business leads for any niche and city and return a list 
 
 # Find business leads
 
-You build lead lists by running Imzlab Technologies' listing Actors on Apify through the **business-leads** connector. Each Actor is a tool on that connector whose name ends with the Actor slug, for example `muhammadafzal--google-maps-scraper`. The connector also exposes `get-actor-run`, `get-dataset-items` and `get-key-value-store-record`, which you need to collect results.
+You build lead lists by running Imzlab Technologies' listing Actors on Apify through the **business-leads** MCP server (some apps call it a connector). Each Actor is a tool on that server whose name contains the Actor slug, for example `muhammadafzal--google-maps-scraper`; depending on the app, the tool name may carry a server prefix, use underscores in place of hyphens, or be shortened with a suffix, so match on the start of the slug (of the two Google Maps tools, the restaurant one has `restaurant` in its name). The server also exposes `get-actor-run`, `get-dataset-items` and `get-key-value-store-record`, which you need to collect results.
 
 Read `references/actor-contracts.md` for the exact input and output of every Actor before your first call in a conversation. `references/niche-routing.md` says which Actor to use for which niche and country, and `references/lead-schema.md` defines the normalized columns, deduplication and CSV export.
 
@@ -34,7 +34,7 @@ Read `references/actor-contracts.md` for the exact input and output of every Act
 
 ## Answer format
 
-Give one table with these columns: Name, Phone, Website, Email (only when the source returns emails), Address, Rating (with review count), Notes. Sort by rating and review count unless the user asked otherwise. Keep it to the first 25 rows in chat and say how many more are in the CSV. Then one line: "Apify cost: about USD X for N rows in M runs, billed to your Apify account." When fewer rows came back than requested, say why in one sentence using the summary record.
+Give one table with these columns: Name, Phone, Website, Email (only when the source returns emails), Address, Rating (with review count), Notes. Sort by rating and review count unless the user asked otherwise. Keep it to the first 25 rows in chat and say how many more are in the CSV. Then one line: "Apify cost: about USD X for N rows in M runs, billed to your Apify account." Work the cost out from the price table in `references/actor-contracts.md` (runs × start fee + charged rows × per-row price). Never quote the usage or cost figures that a run response carries: they are Apify's internal platform usage, not what the run is billed at. When fewer rows came back than requested, say why in one sentence using the summary record.
 
 Show the data as the source gives it. Do not paste raw JSON. Do not show management or owner names from BBB rows unless the user asks who runs the business. Mark an email as "unverified" when `email_verification_status` is `unknown` or `unverified`.
 
@@ -44,7 +44,7 @@ These are business listings published for customers to find the business. Use th
 
 ## When things go wrong
 
-- The connector is not connected or the tool call returns an authorization error: tell the user to open the plugin's Connectors tab and connect Apify (a free account works), then retry.
+- The business-leads server is not connected or the tool call returns an authorization error: tell the user to sign in to Apify (a free account works) for the business-leads server in their app's connector or MCP settings, then retry. In Claude this is the plugin's Connectors tab.
 - The run reports `charge_limit`, `chargeLimitReached`, `REJECTED` or "maximum cost per run": the user's Apify spending limit per run stopped it; report how many rows were delivered and suggest raising the limit in Apify Console or splitting the request.
 - The record says `BLOCKED`, `blocked` or every request failed: Google or the directory refused the lookups; nothing was charged for missing rows. Offer to retry once, or switch source (Yellow Pages for US and Canada, Google Maps for everything else).
 - The contractor Actor refuses to start with a message about the maximum charge: pass `callOptions.maxTotalChargeUsd: 1` or higher.

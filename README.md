@@ -2,7 +2,7 @@
 
 Build local business lead lists without leaving Claude. Ask for any business type in any city, region or ZIP code and the plugin returns a table with phone, website, address, opening hours, rating and review count, plus business emails for dentists and contractors. It draws on **Google Maps (any niche, 12 countries), Yellow Pages USA and Canada, BBB profiles**, dedicated dentist, contractor and restaurant lists, and an email validator for cleaning the list before outreach.
 
-It works in Claude chat, in Cowork and in Claude Code. There are no developer accounts to set up and nothing to configure. Lookups run as pay-per-record Apify Actors on your own Apify account, and you only pay for rows that come back.
+It works in Claude chat, in Cowork and in Claude Code, and the same repository also installs in Grok Build, Grok Bot, Cursor and Hermes Agent (see [Other AI agents](#other-ai-agents-grok-and-hermes)). There are no developer accounts to set up and nothing to configure. Lookups run as pay-per-record Apify Actors on your own Apify account, and you only pay for rows that come back.
 
 ## What you can ask
 
@@ -40,9 +40,66 @@ Not included: lists of private individuals, home addresses, personal phone numbe
 
 In Claude Code, `/mcp` shows the connection state, and `/local-business-leads:leads plumbers in Chicago 30` runs a lookup directly.
 
+## Other AI agents: Grok and Hermes
+
+The skills and the business-leads server are the same on every platform; only the manifest each app reads differs. All of them sign you in to Apify in the browser, and lists are billed to your own Apify account exactly as in Claude.
+
+| App | Reads | What loads |
+|---|---|---|
+| Claude (chat, Cowork, Claude Code) | `.claude-plugin/plugin.json`, `.mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
+| Grok Build | `.grok-plugin/plugin.json`, `.mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
+| Cursor, and Grok Bot through the same plugin format | `.cursor-plugin/plugin.json`, `mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
+| Hermes Agent | `plugin.json`, `mcp.json` (Agent Plugins v1) | skills and business-leads server |
+
+### Grok Build
+
+```bash
+grok plugin install afzalbuilds/local-business-leads
+```
+
+Grok asks you to confirm that you trust the plugin; its business-leads server stays off until you do. Then open `/mcps`, select **business-leads** and press `i` to sign in to Apify. Ask Grok for a list.
+
+### Grok Bot and Cursor
+
+The plugin is not listed in their marketplaces yet. Once it is, add it from the marketplace and sign in to Apify when the business-leads server asks.
+
+On grok.com you can use the Actors today without the skills: open Connectors, add a custom connector and paste the server URL below.
+
+### Hermes Agent
+
+Needs Hermes 0.21.6 or newer, which loads Agent Plugins packages (a root `plugin.json`).
+
+```bash
+hermes plugins install afzalbuilds/local-business-leads --no-enable
+```
+
+```bash
+hermes plugins enable local-business-leads
+```
+
+The package declares the business-leads server, but Hermes signs in to a remote server only when your own configuration asks for it. Register the server under the same name with browser sign-in, so Hermes uses your Apify account for it. Run this in a terminal, not from a script, because Hermes starts the sign-in only when it can talk to you:
+
+```bash
+hermes mcp add business-leads --auth oauth --url "https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator"
+```
+
+Hermes opens Apify's consent page in your browser. After you allow access it lists the server's tools (the eight listing Actors plus the run, dataset and record tools); press Enter to enable them all. `hermes mcp test business-leads` confirms the connection, and `hermes mcp login business-leads` signs in again later if the access is ever revoked.
+
+Every list request is a paid Actor run on your Apify account, so the package marks the server `untrusted`: Hermes asks before each call and refuses them in unattended runs. Your own server entry replaces the package's entry, including that setting; add `trust: untrusted` under `mcp_servers.business-leads` in `~/.hermes/config.yaml` to keep the prompts.
+
+To install only one skill instead of the whole package: `hermes skills install afzalbuilds/local-business-leads/skills/find-business-leads`. The business-leads server still has to be added as above.
+
+### Server URL
+
+Any MCP client can use the Actors directly by adding this URL as a remote (streamable HTTP) server with OAuth:
+
+```
+https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator
+```
+
 ## Pricing
 
-The plugin itself is free. Each row is billed by Apify on your account at the Actor's pay-per-event price. Prices below are the Apify Store prices on the FREE tier as of 2026-11-04. Paid Apify plans get a discount, empty or blocked searches charge no rows, and contractor leads with no phone, website or email are free.
+The plugin itself is free. Each row is billed by Apify on your account at the Actor's pay-per-event price. Prices below are the Apify Store prices on the FREE tier as of 2026-11-13. Paid Apify plans get a discount, empty or blocked searches charge no rows, and contractor leads with no phone, website or email are free.
 
 | Source | Per row | Per run start | Example |
 |---|---|---|---|
@@ -87,11 +144,13 @@ Before anything estimated above USD 0.50, Claude tells you the estimate and asks
 - **lead-list-cleanup**: merge lists, remove duplicates, validate emails, export CSV or CRM columns.
 - **business-trust-check**: BBB rating, accreditation and complaints for a shortlist.
 - **leads-cost-estimate**: estimate the Apify cost before running.
-- **/local-business-leads:leads**, **/local-business-leads:leads-report** and **/local-business-leads:bbb-check** commands (Cowork and Claude Code).
-- **lead-list-builder** agent (Cowork and Claude Code): unattended multi-city build with a spending cap, CSV and summary on disk.
+- **/local-business-leads:leads**, **/local-business-leads:leads-report** and **/local-business-leads:bbb-check** commands (Cowork, Claude Code, Grok Build).
+- **lead-list-builder** agent (Cowork, Claude Code, Grok Build): unattended multi-city build with a spending cap, CSV and summary on disk.
+
+Hermes Agent loads the skills and the business-leads server; it has no equivalent for the commands and the lead-list-builder agent, so ask for a multi-city list in plain words there.
 
 ## Source and support
 
 Source: https://github.com/afzalbuilds/local-business-leads. Issues and feature requests: https://github.com/afzalbuilds/local-business-leads/issues. The Actors are published on Apify Store by Imzlab Technologies under the `muhammadafzal` account.
 
-Last verified: 2026-11-04.
+Last verified: 2026-11-13. Checked with the plugin validators of Claude Code, Grok Build and Hermes Agent 0.23.1.

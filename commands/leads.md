@@ -5,4 +5,4 @@ argument-hint: <niche> in <city or region> [count] [with emails]
 
 Build a lead list using the `find-business-leads` skill from this plugin for: $ARGUMENTS
 
-Work out the niche, place, count (default 20) and whether emails are wanted, route to the right Apify Actor through the business-leads connector, estimate the cost and ask first when it is above USD 0.50, run, wait for every run to finish, read the dataset and the summary record, deduplicate, and present one table plus the Apify cost line. If no niche or place was given, ask for them.
+Work out the niche, place, count (default 20) and whether emails are wanted, route to the right Apify Actor through the business-leads MCP server, estimate the cost and ask first when it is above USD 0.50, run, wait for every run to finish, read the dataset and the summary record, deduplicate, and present one table plus the Apify cost line. If no niche or place was given, ask for them.

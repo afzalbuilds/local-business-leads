@@ -21,7 +21,7 @@ Builds on the `find-business-leads` skill: read its `references/actor-contracts.
 
 4. **Score** each business in plain words, from these signals: `bbb_rating` (A+ to F, or none), `is_accredited`, `years_in_business`, `complaint_count` against size, `review_rating` and `review_count`, and the Google Maps rating and review count if the lead list has them. Suggested bands: "strong" (A or A+, accredited or 5+ years, few complaints), "fine" (A/B rating or no profile but good Google rating and 20+ reviews), "check further" (C or lower, many complaints, under 2 years, or very few reviews), "avoid" (F, unanswered complaint pattern, revoked accreditation).
 
-5. **Answer** with one table: Business, BBB rating, Accredited, Years in business, Complaints, Google rating (reviews), Verdict, Profile link. Then one line with the Apify cost. Offer to pull complaint details for any "check further" row.
+5. **Answer** with one table: Business, BBB rating, Accredited, Years in business, Complaints, Google rating (reviews), Verdict, Profile link. Then one line with the Apify cost, worked out from the BBB prices in `actor-contracts.md` (never from usage or cost fields in a run response). Offer to pull complaint details for any "check further" row.
 
 ## Rules
 
