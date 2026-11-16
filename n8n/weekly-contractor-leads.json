@@ -1,0 +1,409 @@
+{
+  "name": "Collect contractor leads weekly, validate emails and save to Google Sheets",
+  "nodes": [
+    {
+      "id": "496d183a-20db-4cfa-a3cd-a6975277f542",
+      "name": "Run every Monday",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "505289a8-d1a8-4214-84b9-d53928b7c6f3",
+      "name": "Find contractor leads",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "resource": "Actors",
+        "operation": "Run actor and get dataset",
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "muhammadafzal~contractor-lead-scraper"
+        },
+        "actorInputMode": "json",
+        "customBody": "{\n  \"businessType\": \"Roofer\",\n  \"location\": \"Tampa, FL\",\n  \"maxResults\": 25,\n  \"enrichEmails\": true,\n  \"verifyEmails\": false,\n  \"enrichSocials\": true,\n  \"outputFormat\": \"full\"\n}",
+        "timeout": 1800,
+        "memory": 512,
+        "maxTotalChargeUsd": 2,
+        "authentication": "apifyApi"
+      },
+      "notes": "Runs the Apify Actor muhammadafzal/contractor-lead-scraper. Edit businessType, location and maxResults in the JSON input. About USD 0.05 per lead that has a phone, website or email. Apify needs a maximum charge of at least USD 1.00 for this Actor."
+    },
+    {
+      "id": "5d47c6ad-0f19-4776-886e-0063985c6f20",
+      "name": "Add email check to leads",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByFields",
+        "advanced": false,
+        "fieldsToMatchString": "email",
+        "joinMode": "enrichInput1",
+        "options": {
+          "multipleMatches": "first"
+        }
+      }
+    },
+    {
+      "id": "36c607e2-b71f-4fc3-a956-bc23b8c15827",
+      "name": "Keep leads with an email",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.email || \"\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true
+      }
+    },
+    {
+      "id": "3ddeea9e-76ef-4c97-8ee0-4b33ca71b5a7",
+      "name": "Collect email addresses",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        80
+      ],
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "email",
+              "renameField": true,
+              "outputFieldName": "emails"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3ddf1328-7ea9-49d0-8bcb-619f99276f43",
+      "name": "Validate email addresses",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 2,
+      "position": [
+        896,
+        80
+      ],
+      "parameters": {
+        "resource": "Actors",
+        "operation": "Run actor and get dataset",
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "muhammadafzal~email-address-validator"
+        },
+        "actorInputMode": "json",
+        "customBody": "={{ JSON.stringify({ emails: $json.emails, checkDns: true, checkMx: true, allowDisposable: false, allowRoleAccounts: true, outputInvalidOnly: false, maxEmails: $json.emails.length }) }}",
+        "timeout": 600,
+        "memory": 512,
+        "maxTotalChargeUsd": 1,
+        "authentication": "apifyApi"
+      },
+      "notes": "Runs the Apify Actor muhammadafzal/email-address-validator on all addresses in one run. It checks syntax, DNS and mail servers; it never sends mail. About USD 0.0015 per address."
+    },
+    {
+      "id": "5f558d0d-72a3-4c8a-81da-d244077b2bfa",
+      "name": "Save lead to sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "authentication": "oAuth2",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Contractor leads"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Place ID"
+          ],
+          "value": {
+            "Place ID": "={{ $json.place_id }}",
+            "Business": "={{ $json.business_name }}",
+            "Trade": "={{ $json.business_type || $json.category || \"\" }}",
+            "Phone": "={{ $json.phone || \"\" }}",
+            "Email": "={{ $json.email || \"\" }}",
+            "Email check": "={{ $json.email ? ($json.status || \"not checked\") : \"\" }}",
+            "Website": "={{ $json.website || \"\" }}",
+            "Address": "={{ $json.address || \"\" }}",
+            "Rating": "={{ $json.rating ?? \"\" }}",
+            "Reviews": "={{ $json.review_count ?? \"\" }}",
+            "Google Maps URL": "={{ $json.google_maps_url || \"\" }}",
+            "Last seen": "={{ $now.toISODate() }}"
+          },
+          "schema": [
+            {
+              "id": "Place ID",
+              "displayName": "Place ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Business",
+              "displayName": "Business",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trade",
+              "displayName": "Trade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email check",
+              "displayName": "Email check",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reviews",
+              "displayName": "Reviews",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Maps URL",
+              "displayName": "Google Maps URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last seen",
+              "displayName": "Last seen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f0fdb56e-65a6-4c73-aa64-5c4cb870c22f",
+      "name": "Sticky Note 83585fd0",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -96
+      ],
+      "parameters": {
+        "content": "### Edit your search\nSet businessType, location and maxResults in this node.",
+        "color": 7,
+        "width": 160,
+        "height": 224
+      }
+    }
+  ],
+  "connections": {
+    "Run every Monday": {
+      "main": [
+        [
+          {
+            "node": "Find contractor leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find contractor leads": {
+      "main": [
+        [
+          {
+            "node": "Add email check to leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Keep leads with an email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add email check to leads": {
+      "main": [
+        [
+          {
+            "node": "Save lead to sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep leads with an email": {
+      "main": [
+        [
+          {
+            "node": "Collect email addresses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect email addresses": {
+      "main": [
+        [
+          {
+            "node": "Validate email addresses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate email addresses": {
+      "main": [
+        [
+          {
+            "node": "Add email check to leads",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

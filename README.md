@@ -97,6 +97,10 @@ Any MCP client can use the Actors directly by adding this URL as a remote (strea
 https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator
 ```
 
+## n8n workflow templates
+
+Two ready-made n8n workflows use the same lead Actors: a form that saves Google Maps leads to Google Sheets, and a weekly contractor search with email validation. Import the JSON files from the [n8n folder](n8n/README.md); they need the Apify node for n8n and your own Apify account.
+
 ## Pricing
 
 The plugin itself is free. Each row is billed by Apify on your account at the Actor's pay-per-event price. Prices below are the Apify Store prices on the FREE tier as of 2026-11-13. Paid Apify plans get a discount, empty or blocked searches charge no rows, and contractor leads with no phone, website or email are free.
