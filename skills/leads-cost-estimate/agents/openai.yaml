@@ -1,0 +1,14 @@
+# Generated copy of the Claude plugin file; edit the original in commands/ or agents/ and regenerate.
+interface:
+  display_name: "Leads Cost Estimate"
+  short_description: "Estimate the Apify cost of a lead list"
+  brand_color: "#006048"
+  default_prompt: "Use $leads-cost-estimate to price 500 contractor leads across five Texas cities."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "business-leads"
+      description: "Apify's hosted MCP server limited to Imzlab Technologies' Actors (sign in with Apify)"
+      transport: "streamable_http"
+      url: "https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator"

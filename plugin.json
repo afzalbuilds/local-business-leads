@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "local-business-leads",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Build local business lead lists from your AI agent: any niche and city from Google Maps, plus Yellow Pages US and Canada, BBB ratings, and dentist, contractor, HVAC and restaurant lists with phones, websites, hours, ratings and business emails. Dedupe, validate emails and export CSV. Pay per record on your Apify account.",
   "author": {
     "name": "Imzlab Technologies",

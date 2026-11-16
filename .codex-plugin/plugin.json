@@ -1,0 +1,53 @@
+{
+  "name": "local-business-leads",
+  "version": "1.2.0",
+  "description": "Build local business lead lists from your AI agent: any niche and city from Google Maps, plus Yellow Pages US and Canada, BBB ratings, and dentist, contractor, HVAC and restaurant lists with phones, websites, hours, ratings and business emails. Dedupe, validate emails and export CSV. Pay per record on your Apify account.",
+  "author": {
+    "name": "Imzlab Technologies",
+    "email": "info@imzlab.com",
+    "url": "https://imzlab.com"
+  },
+  "homepage": "https://github.com/afzalbuilds/local-business-leads#readme",
+  "repository": "https://github.com/afzalbuilds/local-business-leads",
+  "license": "MIT",
+  "keywords": [
+    "lead generation",
+    "local business leads",
+    "google maps scraper",
+    "yellow pages",
+    "bbb rating",
+    "business directory",
+    "b2b leads",
+    "email validation",
+    "contractor leads",
+    "dentist leads",
+    "hvac leads",
+    "restaurant list",
+    "prospecting",
+    "sales",
+    "apify"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Local Business Leads",
+    "shortDescription": "Local leads from Google Maps",
+    "longDescription": "Build local business lead lists from your AI agent: any niche and city from Google Maps, plus Yellow Pages US and Canada, BBB ratings, and dentist, contractor, HVAC and restaurant lists with phones, websites, hours, ratings and business emails. Dedupe, validate emails and export CSV. Pay per record on your Apify account. Includes 4 skills (business-trust-check, find-business-leads, lead-list-cleanup, leads-cost-estimate) and Apify's hosted MCP server limited to Imzlab's Actors. After installing, run `codex mcp login business-leads` to sign in to Apify in the browser.",
+    "developerName": "Imzlab Technologies",
+    "category": "Business & Operations",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Find 30 plumbers in Chicago with phone numbers and websites.",
+      "Dentists in Denver and Boulder with emails, as a CSV.",
+      "Check the BBB ratings of these three roofing companies in Tampa."
+    ],
+    "websiteURL": "https://github.com/afzalbuilds/local-business-leads#readme",
+    "privacyPolicyURL": "https://imzlab.com/privacy#local-leads",
+    "termsOfServiceURL": "https://imzlab.com/terms#local-leads",
+    "brandColor": "#006048",
+    "logo": "./assets/icon.png",
+    "composerIcon": "./assets/icon.png"
+  }
+}

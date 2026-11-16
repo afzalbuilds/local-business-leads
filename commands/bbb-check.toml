@@ -1,0 +1,7 @@
+# Generated copy of the Claude plugin file; edit the original in commands/ or agents/ and regenerate.
+description = "Check BBB rating, accreditation and complaints for businesses (US and Canada)"
+prompt = '''
+Run a trust check using the `business-trust-check` skill from this plugin for: {{args}}
+
+Look each business up through the BBB Actor on the business-leads MCP server, wait for the run, match rows to the requested businesses, and present the trust table with a verdict per business and the Apify cost line. If the argument is empty, use the shortlist from the current conversation, or ask for one.
+'''

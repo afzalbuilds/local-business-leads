@@ -1,0 +1,14 @@
+# Generated copy of the Claude plugin file; edit the original in commands/ or agents/ and regenerate.
+interface:
+  display_name: "Find Business Leads"
+  short_description: "Local leads with phone, website, rating and email"
+  brand_color: "#006048"
+  default_prompt: "Use $find-business-leads to find 30 plumbers in Chicago with phones and websites."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "business-leads"
+      description: "Apify's hosted MCP server limited to Imzlab Technologies' Actors (sign in with Apify)"
+      transport: "streamable_http"
+      url: "https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator"

@@ -1,0 +1,15 @@
+{
+  "name": "local-business-leads",
+  "version": "1.2.0",
+  "description": "Build local business lead lists from your AI agent: any niche and city from Google Maps, plus Yellow Pages US and Canada, BBB ratings, and dentist, contractor, HVAC and restaurant lists with phones, websites, hours, ratings and business emails. Dedupe, validate emails and export CSV. Pay per record on your Apify account.",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "business-leads": {
+      "url": "https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator",
+      "type": "http",
+      "oauth": {
+        "enabled": true
+      }
+    }
+  }
+}

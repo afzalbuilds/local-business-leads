@@ -1,0 +1,7 @@
+---
+description: "Find local business leads for a niche and place (Google Maps, dentist, contractor, restaurant, Yellow Pages US/CA)"
+---
+
+Build a lead list using the `find-business-leads` skill from this plugin for: $ARGUMENTS
+
+Work out the niche, place, count (default 20) and whether emails are wanted, route to the right Apify Actor through the business-leads MCP server, estimate the cost and ask first when it is above USD 0.50, run, wait for every run to finish, read the dataset and the summary record, deduplicate, and present one table plus the Apify cost line. If no niche or place was given, ask for them.

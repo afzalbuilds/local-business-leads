@@ -2,7 +2,7 @@
 
 Build local business lead lists without leaving Claude. Ask for any business type in any city, region or ZIP code and the plugin returns a table with phone, website, address, opening hours, rating and review count, plus business emails for dentists and contractors. It draws on **Google Maps (any niche, 12 countries), Yellow Pages USA and Canada, BBB profiles**, dedicated dentist, contractor and restaurant lists, and an email validator for cleaning the list before outreach.
 
-It works in Claude chat, in Cowork and in Claude Code, and the same repository also installs in Grok Build, Grok Bot, Cursor and Hermes Agent (see [Other AI agents](#other-ai-agents-grok-and-hermes)). There are no developer accounts to set up and nothing to configure. Lookups run as pay-per-record Apify Actors on your own Apify account, and you only pay for rows that come back.
+It works in Claude chat, in Cowork and in Claude Code, and the same repository also installs as a native plugin in OpenAI Codex, Gemini CLI, GitHub Copilot, Grok, Cursor, Hermes Agent and OpenCode, with the skills usable in many more agents (see [Other AI agents](#other-ai-agents-codex-gemini-cli-copilot-and-more)). There are no developer accounts to set up and nothing to configure. Lookups run as pay-per-record Apify Actors on your own Apify account, and you only pay for rows that come back.
 
 ## What you can ask
 
@@ -40,16 +40,66 @@ Not included: lists of private individuals, home addresses, personal phone numbe
 
 In Claude Code, `/mcp` shows the connection state, and `/local-business-leads:leads plumbers in Chicago 30` runs a lookup directly.
 
-## Other AI agents: Grok and Hermes
+## Other AI agents: Codex, Gemini CLI, Copilot and more
 
-The skills and the business-leads server are the same on every platform; only the manifest each app reads differs. All of them sign you in to Apify in the browser, and lists are billed to your own Apify account exactly as in Claude.
+The skills and the **business-leads** server are the same in every app; only the manifest each app reads differs. Every app signs you in to Apify in the browser, and lists are billed to your own Apify account exactly as in Claude.
 
-| App | Reads | What loads |
+| App | Install | What loads |
 |---|---|---|
-| Claude (chat, Cowork, Claude Code) | `.claude-plugin/plugin.json`, `.mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
-| Grok Build | `.grok-plugin/plugin.json`, `.mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
-| Cursor, and Grok Bot through the same plugin format | `.cursor-plugin/plugin.json`, `mcp.json` | skills, commands, lead-list-builder agent, business-leads server |
-| Hermes Agent | `plugin.json`, `mcp.json` (Agent Plugins v1) | skills and business-leads server |
+| Claude (chat, Cowork, Claude Code) | [How to set it up](#how-to-set-it-up) | skills, commands, lead-list-builder agent, business-leads server |
+| OpenAI Codex (CLI and app) | [OpenAI Codex](#openai-codex) | skills, business-leads server |
+| Gemini CLI (and Qwen Code) | [Gemini CLI](#gemini-cli) | skills, commands, lead-list-builder subagent, business-leads server |
+| GitHub Copilot CLI and VS Code | [GitHub Copilot](#github-copilot-cli-and-vs-code) | skills, commands, lead-list-builder agent, business-leads server |
+| Grok Build | [Grok Build](#grok-build) | skills, commands, lead-list-builder agent, business-leads server |
+| Cursor and Grok Bot | [Grok Bot and Cursor](#grok-bot-and-cursor) | skills, commands, lead-list-builder agent, business-leads server |
+| Hermes Agent | [Hermes Agent](#hermes-agent) | skills, business-leads server |
+| OpenCode | [OpenCode](#opencode) | skills, commands, lead-list-builder subagent, business-leads server |
+| Antigravity, Kiro, Devin, Factory Droid, Augment, Junie, Mistral Vibe | [More agents](#more-agents) | skills and business-leads server, plus commands and agent where the app supports them |
+| Any other agent with skills support | [More agents](#more-agents) | skills, plus the server URL added by hand |
+
+Checked on 2026-11-16: the plugin installs, and its skills and server load, in Codex 0.167, Gemini CLI 0.68.0, GitHub Copilot CLI 1.0.112 and OpenCode 1.18.27, and it passes the plugin validators of Claude Code, Gemini CLI, Grok Build and Hermes Agent. Apify sign-in and a live list were not repeated in those apps. The apps under [More agents](#more-agents) follow each app's published plugin format but were not installed.
+
+### OpenAI Codex
+
+Needs Codex CLI 0.142 or newer (`codex update`). The Codex app uses the same settings, so the plugin appears there too.
+
+```bash
+codex plugin marketplace add afzalbuilds/local-business-leads
+```
+
+```bash
+codex plugin add local-business-leads@imzlab-local-leads
+```
+
+```bash
+codex mcp login business-leads
+```
+
+The last command opens Apify's sign-in page in your browser. Ask Codex for a list. You can also call a skill by name, for example `$find-business-leads`. Codex loads the skills and the business-leads server, but not the plugin's commands or the lead-list-builder agent, so ask for a multi-city list in plain words there.
+
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/afzalbuilds/local-business-leads
+```
+
+When Gemini CLI first connects to the business-leads server it opens Apify's sign-in page in your browser; if it does not, run `/mcp auth business-leads` inside Gemini CLI. The extension adds the skills, the `/leads`, `/leads-report` and `/bbb-check` commands and the lead-list-builder subagent. Update it later with `gemini extensions update local-business-leads`.
+
+Qwen Code installs the same extension: `qwen extensions install afzalbuilds/local-business-leads`.
+
+### GitHub Copilot CLI and VS Code
+
+```bash
+copilot plugin marketplace add afzalbuilds/local-business-leads
+```
+
+```bash
+copilot plugin install local-business-leads@imzlab-local-leads
+```
+
+In a Copilot CLI session, run `/mcp auth business-leads` to sign in to Apify. The plugin adds the skills, the `/leads`, `/leads-report` and `/bbb-check` commands, the lead-list-builder agent and the business-leads server.
+
+In VS Code, turn on the `chat.plugins.enabled` setting, run **Chat: Install Plugin from Source** from the Command Palette and enter `afzalbuilds/local-business-leads`.
 
 ### Grok Build
 
@@ -88,6 +138,37 @@ Hermes opens Apify's consent page in your browser. After you allow access it lis
 Every list request is a paid Actor run on your Apify account, so the package marks the server `untrusted`: Hermes asks before each call and refuses them in unattended runs. Your own server entry replaces the package's entry, including that setting; add `trust: untrusted` under `mcp_servers.business-leads` in `~/.hermes/config.yaml` to keep the prompts.
 
 To install only one skill instead of the whole package: `hermes skills install afzalbuilds/local-business-leads/skills/find-business-leads`. The business-leads server still has to be added as above.
+
+### OpenCode
+
+OpenCode has no plugin bundle, so the skills, the server and the extras are added separately:
+
+```bash
+npx skills add afzalbuilds/local-business-leads -a opencode -g
+```
+
+```bash
+opencode mcp add business-leads --url "https://mcp.apify.com/?tools=muhammadafzal/google-maps-scraper,muhammadafzal/contractor-lead-scraper,muhammadafzal/worldwide-dentist-scraper,muhammadafzal/google-maps-restaurant-scraper,muhammadafzal/yellow-pages-us-scraper,muhammadafzal/yellow-pages-ca-scraper,muhammadafzal/bbb-business-scraper,muhammadafzal/email-address-validator"
+```
+
+```bash
+opencode mcp auth business-leads
+```
+
+For the `/leads`, `/leads-report` and `/bbb-check` commands and the lead-list-builder subagent, copy the `opencode/commands` and `opencode/agents` folders of this repository into `~/.config/opencode/`.
+
+### More agents
+
+| App | How to install |
+|---|---|
+| Google Antigravity | `agy plugin install https://github.com/afzalbuilds/local-business-leads` |
+| Kiro | Powers panel, **Add Custom Power**, **Import power from GitHub**, then `https://github.com/afzalbuilds/local-business-leads` |
+| Devin (formerly Windsurf) | `devin plugins install afzalbuilds/local-business-leads` |
+| Factory Droid | `droid plugin marketplace add afzalbuilds/local-business-leads`, then `droid plugin install local-business-leads@imzlab-local-leads --scope user` |
+| Augment (Auggie CLI) | `auggie plugin marketplace add afzalbuilds/local-business-leads`, then enable the plugin in `/plugins` |
+| JetBrains Junie CLI | `/extensions marketplace add afzalbuilds/local-business-leads`, then `/extensions install local-business-leads` |
+| Mistral Vibe | clone this repository into `~/.vibe/plugins/local-business-leads`, run `/reload-plugins`, then `/mcp login business-leads` |
+| Cline, Kilo Code, Amp, Goose and other agents that read Agent Skills | `npx skills add afzalbuilds/local-business-leads` installs the skills; then add the server URL below as a remote MCP server with OAuth in that app |
 
 ### Server URL
 
@@ -148,13 +229,13 @@ Before anything estimated above USD 0.50, Claude tells you the estimate and asks
 - **lead-list-cleanup**: merge lists, remove duplicates, validate emails, export CSV or CRM columns.
 - **business-trust-check**: BBB rating, accreditation and complaints for a shortlist.
 - **leads-cost-estimate**: estimate the Apify cost before running.
-- **/local-business-leads:leads**, **/local-business-leads:leads-report** and **/local-business-leads:bbb-check** commands (Cowork, Claude Code, Grok Build).
-- **lead-list-builder** agent (Cowork, Claude Code, Grok Build): unattended multi-city build with a spending cap, CSV and summary on disk.
+- **/local-business-leads:leads**, **/local-business-leads:leads-report** and **/local-business-leads:bbb-check** commands (Claude Code, Cowork, Gemini CLI, Copilot, Grok Build, OpenCode).
+- **lead-list-builder** agent (Claude Code, Cowork, Gemini CLI, Copilot, Grok Build, OpenCode): unattended multi-city build with a spending cap, CSV and summary on disk.
 
-Hermes Agent loads the skills and the business-leads server; it has no equivalent for the commands and the lead-list-builder agent, so ask for a multi-city list in plain words there.
+Codex and Hermes Agent load the skills and the business-leads server only; there, ask for a multi-city list in plain words. In Codex the skills can also be called by name, for example `$find-business-leads`.
 
 ## Source and support
 
 Source: https://github.com/afzalbuilds/local-business-leads. Issues and feature requests: https://github.com/afzalbuilds/local-business-leads/issues. The Actors are published on Apify Store by Imzlab Technologies under the `muhammadafzal` account.
 
-Last verified: 2026-11-13. Checked with the plugin validators of Claude Code, Grok Build and Hermes Agent 0.23.1.
+Last verified: 2026-11-16. Checked with the plugin validators of Claude Code, Gemini CLI, Grok Build and Hermes Agent 0.23.1; install and loading checked in Codex 0.167, Gemini CLI 0.68.0, GitHub Copilot CLI 1.0.112 and OpenCode 1.18.27.
